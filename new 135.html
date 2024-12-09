@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Python Quiz Application</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f9;
+        }
+        .quiz-container {
+            max-width: 800px;
+            margin: 50px auto;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+        .question {
+            margin-bottom: 20px;
+        }
+        .options label {
+            display: block;
+            margin-bottom: 8px;
+        }
+        .options input {
+            margin-right: 10px;
+        }
+        .btn {
+            display: inline-block;
+            padding: 10px 20px;
+            background-color: #007bff;
+            color: white;
+            text-decoration: none;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        .btn:hover {
+            background-color: #0056b3;
+        }
+        .results {
+            text-align: center;
+            margin-top: 20px;
+        }
+        .navigation {
+            text-align: center;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="quiz-container">
+        <h1>Python Quiz</h1>
+        <div id="quiz"></div>
+        <div class="navigation">
+            <button class="btn" id="prev">Previous</button>
+            <button class="btn" id="next">Next</button>
+        </div>
+        <button class="btn" id="submit" style="display: none;">Submit Quiz</button>
+        <div id="results" class="results"></div>
+    </div>
+
+    <script>
+        const quizData = [
+           {
+                question: "What is the output of print(10 / 3)?",
+                options: ["3", "3.33", "3.0", "3.3333333333333335"],
+                correct: 3
+            },
+            {
+                question: "Which data type is immutable in Python?",
+                options: ["List", "Tuple", "Dictionary", "Set"],
+                correct: 1
+            },
+            {
+                question: "What does the following code output?\nif 5 > 3:\n    print('Yes')",
+                options: ["Yes", "No", "Error", "None"],
+                correct: 0
+            },
+            {
+                question: "Which method is used to get the current working directory in the 'os' module?",
+                options: ["os.getcwd()", "os.getpath()", "os.cwd()", "os.pwd()"],
+                correct: 0
+            },
+            {
+                question: "Which method in pyttsx3 module is used to make the engine speak?",
+                options: ["engine.say()", "engine.speak()", "engine.talk()", "engine.voice()"],
+                correct: 0
+            },
+            {
+                question: "Which of the following is a valid way to define a tuple?",
+                options: ["A. (1, 2, 3)", "B. [1, 2, 3]", "C. {1, 2, 3}", "D. tuple[1, 2, 3]"],
+                correct: 0
+            },
+            {
+                question: "What will be the output of the following code?\n\nnum = 7.5\nprint(type(num))",
+                options: ["A. class 'int'", "B. class 'float'", "C. class 'str'", "D. class 'tuple'"],
+                correct: 1
+            },
+            {
+                question: "What does the `os` module in Python help with?",
+                options: ["A. Data visualization", "B. Handling file system operations", "C. Mathematical operations", "D. Text-to-speech conversion"],
+                correct: 1
+            },
+            {
+                question: "Which method from the pyttsx3 module is used to speak a text string?",
+                options: ["A. speak_text()", "B. say()", "C. speech()", "D. talk()"],
+                correct: 1
+            },
+            {
+                question: "What will the following loop print?\n\nfor i in range(3):\n    print(i, end=\" \")",
+                options: ["A. 0 1 2", "B. 1 2 3", "C. 0 1 2 3", "D. 1 2"],
+                correct: 0
+            },
+            {
+                question: "Which of the following is not a valid way to create a list?",
+                options: ["A. list1 = []", "B. list2 = list()", "C. list3 = {1, 2, 3}", "D. list4 = [1, 2, 3]"],
+                correct: 2
+            },
+            {
+                question: "What will the output of the following code be?\n\nx = 10\nif x > 5:\n    print('A')\nelif x == 10:\n    print('B')\nelse:\n    print('C')",
+                options: ["A. A", "B. B", "C. C", "D. A B"],
+                correct: 0
+            },
+            {
+                question: "What is the correct syntax for a while loop?",
+                options: ["A. while (condition):", "B. while {condition}", "C. while [condition]:", "D. while condition;"],
+                correct: 0
+            },
+            {
+                question: "Which of the following is immutable in Python?",
+                options: ["A. List", "B. Tuple", "C. Dictionary", "D. Set"],
+                correct: 1
+            },
+            {
+                question: "What does the following code snippet print?\n\nnums = [1, 2, 3]\nnums.append(4)\nprint(nums)",
+                options: ["A. [1, 2, 3]", "B. [1, 2, 3, 4]", "C. [4, 1, 2, 3]", "D. Error"],
+                correct: 1
+            },
+            {
+                question: "What will the following code output?\n\nx = 'hello'\nprint(x.upper())",
+                options: ["A. hello", "B. HELLO", "C. Hello", "D. error"],
+                correct: 1
+            },
+            {
+                question: "What does the `os.getcwd()` function do?",
+                options: ["A. Deletes a directory", "B. Gets the current working directory", "C. Creates a new directory", "D. Lists all files in a directory"],
+                correct: 1
+            },
+            {
+                question: "Which of the following correctly uses the range function in a for loop?",
+                options: ["A. for i in range(1, 10):", "B. for i in range[1, 10]:", "C. for i in (1, 10):", "D. for i in range{1, 10}:"],
+                correct: 0
+            },
+            {
+                question: "What is the purpose of the `break` statement in a loop?",
+                options: ["A. Skips the current iteration", "B. Terminates the loop", "C. Continues the next iteration", "D. Exits the program"],
+                correct: 1
+            },
+            {
+                question: "How can you create a float variable in Python?",
+                options: ["A. num = 10", "B. num = 10.0", "C. num = '10'", "D. num = [10]"],
+                correct: 1
+            },
+            {
+                question: "What will the following code print?\n\nx = [1, 2, 3]\nx[0] = 10\nprint(x)",
+                options: ["A. [1, 2, 3]", "B. [10, 2, 3]", "C. [1, 10, 3]", "D. Error"],
+                correct: 1
+            },
+            {
+                question: "Which function in pyttsx3 is used to start speaking the queued text?",
+                options: ["A. speak()", "B. runAndWait()", "C. start()", "D. execute()"],
+                correct: 1
+            },
+            {
+                question: "What will the following code output?\n\nif not False:\n    print('True')",
+                options: ["A. False", "B. True", "C. Error", "D. None"],
+                correct: 1
+            },
+            {
+                question: "What is the correct way to import the os module?",
+                options: ["A. import os", "B. include os", "C. using os", "D. os import"],
+                correct: 0
+            },
+			{
+        "question": "What data type is used to represent a sequence of characters in Python?",
+        "options": ["int", "float", "str", "list"],
+        "correct": 2
+    },
+    {
+        "question": "Which of the following is a valid way to define a list in Python?",
+        "options": ["A. [1, 2, 3]", "B. (1, 2, 3)", "C. {1, 2, 3}", "D. list[1, 2, 3]"],
+        "correct": 0
+    },
+    {
+        "question": "Which method is used to append an item to a list in Python?",
+        "options": ["list.add()", "list.append()", "list.insert()", "list.push()"],
+        "correct": 1
+    },
+    {
+        "question": "What keyword is used to check for membership in a list or tuple?",
+        "options": ["with", "has", "in", "for"],
+        "correct": 2
+    },
+    {
+        "question": "Which of the following is NOT a mutable data type?",
+        "options": ["list", "tuple", "dict", "set"],
+        "correct": 1
+    },
+    {
+        "question": "What will be the output of 'type(5.0)' in Python?",
+        "options": ["int", "float", "str", "NoneType"],
+        "correct": 1
+    },
+    {
+        "question": "Which of the following loops executes at least once regardless of the condition?",
+        "options": ["for loop", "while loop", "do-while loop", "None of the above"],
+        "correct": 2
+    },
+    {
+        "question": "What keyword is used to stop a loop prematurely?",
+        "options": ["stop", "break", "exit", "continue"],
+        "correct": 1
+    },
+    {
+        "question": "What is the correct syntax for an if-else statement in Python?",
+        "options": [
+            "A. if condition: ... else: ...",
+            "B. if (condition) { ... } else { ... }",
+            "C. if condition { ... } else { ... }",
+            "D. if condition: ... elif condition: ... else: ..."
+        ],
+        "correct": 0
+    },
+    {
+        "question": "What is the output of 'print(2 == 2)'?",
+        "options": ["True", "False", "2", "Error"],
+        "correct": 0
+    },
+    {
+        "question": "Which of the following will correctly declare a tuple?",
+        "options": ["A. (1, 2, 3)", "B. [1, 2, 3]", "C. {1, 2, 3}", "D. tuple[1, 2, 3]"],
+        "correct": 0
+    },
+    {
+        "question": "Which of the following is a valid for loop syntax in Python?",
+        "options": [
+            "A. for i in range(5):",
+            "B. for (i = 0; i < 5; i++):",
+            "C. foreach i in range(5):",
+            "D. for i to 5:"
+        ],
+        "correct": 0
+    },
+    {
+        "question": "What will 'len([1, 2, 3, 4])' return?",
+        "options": ["1", "2", "3", "4"],
+        "correct": 3
+    },
+    {
+        "question": "What is the purpose of the 'continue' statement in Python loops?",
+        "options": [
+            "A. To exit the loop",
+            "B. To skip the current iteration and continue with the next",
+            "C. To pause the loop execution temporarily",
+            "D. To restart the loop"
+        ],
+        "correct": 1
+    }
+        ];
+const quizContainer = document.getElementById('quiz');
+const resultsContainer = document.getElementById('results');
+const submitButton = document.getElementById('submit');
+const prevButton = document.getElementById('prev');
+const nextButton = document.getElementById('next');
+
+let currentPage = 0;
+const questionsPerPage = 3;
+
+// Object to store the user's selected answers
+let userAnswers = {};
+
+// Function to show the page with questions
+function showPage(page) {
+    const start = page * questionsPerPage;
+    const end = start + questionsPerPage;
+    const currentQuestions = quizData.slice(start, end);
+
+    const output = currentQuestions.map((currentQuestion, index) => {
+        const options = currentQuestion.options.map((option, i) => {
+            // Check if there's a stored answer for this question
+            const checked = userAnswers[start + index] === i ? 'checked' : '';
+            return `<label><input type="radio" name="question${start + index}" value="${i}" ${checked}>${option}</label>`;
+        }).join('');
+
+        return `<div class="question">${currentQuestion.question}</div><div class="options">${options}</div>`;
+    }).join('');
+
+    quizContainer.innerHTML = output;
+
+    prevButton.style.display = page === 0 ? 'none' : 'inline-block';
+    nextButton.style.display = end >= quizData.length ? 'none' : 'inline-block';
+    submitButton.style.display = end >= quizData.length ? 'inline-block' : 'none';
+}
+
+// Function to store the user's selected answer
+function storeAnswer() {
+    const answerContainers = document.querySelectorAll('.options');
+    answerContainers.forEach((answerContainer, questionNumber) => {
+        const selector = `input[name=question${currentPage * questionsPerPage + questionNumber}]:checked`;
+        const userAnswer = (answerContainer.querySelector(selector) || {}).value;
+
+        if (userAnswer !== undefined) {
+            userAnswers[currentPage * questionsPerPage + questionNumber] = parseInt(userAnswer);
+        }
+    });
+}
+
+// Function to show the results after the quiz
+function showResults() {
+    storeAnswer(); // Store answers before calculating results
+    const answerContainers = document.querySelectorAll('.options');
+    let numCorrect = 0;
+
+    quizData.forEach((currentQuestion, questionNumber) => {
+        const answerContainer = answerContainers[questionNumber % questionsPerPage];
+        if (!answerContainer) return;
+
+        const selector = `input[name=question${questionNumber}]:checked`;
+        const userAnswer = (answerContainer.querySelector(selector) || {}).value;
+
+        if (Number(userAnswer) === currentQuestion.correct) {
+            numCorrect++;
+            answerContainer.style.color = 'green';
+        } else {
+            answerContainer.style.color = 'red';
+        }
+    });
+
+    resultsContainer.innerHTML = `You got ${numCorrect} out of ${quizData.length} correct!`;
+}
+
+// Event listeners for navigation buttons
+prevButton.addEventListener('click', () => {
+    storeAnswer(); // Save the current page's answers before moving back
+    currentPage--;
+    showPage(currentPage);
+});
+
+nextButton.addEventListener('click', () => {
+    storeAnswer(); // Save the current page's answers before moving forward
+    currentPage++;
+    showPage(currentPage);
+});
+
+// Event listener for the submit button
+submitButton.addEventListener('click', showResults);
+
+// Initial page display
+showPage(currentPage);
+    </script>
+</body>
+</html>
